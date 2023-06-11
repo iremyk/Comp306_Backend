@@ -26,7 +26,26 @@ const getMostRatedDirectors = async (req, res) => {
   }
 };
 
+const getFavoriteGenres = async (req, res) => {
+  try {
+    const { director } = req.query;
+    const query = `SELECT movies_genres.genre, COUNT(movies.id) AS count
+                  FROM movies_genres, movies, movies_directors, directors
+                  WHERE (movies_genres.movie_id AND movies.id = movies_genres.movie_id)
+                    AND (movies.id = movies_directors.movie_id AND directors.id = movies_directors.director_id)
+                    AND directors.id = ${director}
+                  GROUP BY movies_genres.genre 
+                  ORDER BY count DESC
+                  LIMIT 3`;
+    const results = await makeQuery(query);
+    res.send(results);
+  } catch (err) {
+    res.send(err.message);
+  }
+};
+
 module.exports = {
   getDirectorById,
-  getMostRatedDirectors
+  getMostRatedDirectors,
+  getFavoriteGenres
 };

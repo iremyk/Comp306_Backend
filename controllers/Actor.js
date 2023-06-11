@@ -22,7 +22,23 @@ const getCommonMovies = async (req, res) => {
                   SELECT DISTINCT movies.name
                   FROM movies, actors, roles 
                   WHERE (movies.id = roles.movie_id AND roles.actor_id = actors.id)
-                  AND actors.name LIKE '%${actor2}%';`;
+                  AND actors.name LIKE '%${actor2}%'`;
+    const results = await makeQuery(query);
+    res.send(results);
+  } catch (err) {
+    res.send(err.message);
+  }
+};
+
+const getMostRatedRoles = async (req, res) => {
+  try {
+    const { actor } = req.query;
+    const query = `SELECT actors.name, actors.id, AVG(movies.rank) AS avg_rank
+                  FROM actors, roles, movies
+                  WHERE (actors.id = roles.actor_id AND movies.id = roles.movie_id) AND actors.id = ${actor}
+                  GROUP BY actors.name, actors.id
+                  ORDER BY avg_rank DESC
+                  LIMIT 20`;
     const results = await makeQuery(query);
     res.send(results);
   } catch (err) {
@@ -32,5 +48,6 @@ const getCommonMovies = async (req, res) => {
 
 module.exports = {
   getActorById,
-  getCommonMovies
+  getCommonMovies,
+  getMostRatedRoles
 };
