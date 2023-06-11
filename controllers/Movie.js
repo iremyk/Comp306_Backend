@@ -26,25 +26,27 @@ const getMovieByFilter = async (req, res) => {
     let { name, startYear, endYear, startRank, endRank, genre, actor, director } = req.query;
 
     name = name ? name : null;
-    startYear = startYear ? startYear : null;
-    endYear = endYear ? endYear : null;
-    startRank = startRank ? startRank : null;
-    endRank = endRank ? endRank : null;
+    startYear = parseInt(startYear) ? parseInt(startYear) : null;
+    endYear = parseInt(endYear) ? parseInt(endYear) : null;
+    startRank = parseFloat(startRank) ? parseFloat(startRank) : null;
+    endRank = parseFloat(endRank) ? parseFloat(endRank) : null;
     genre = genre ? genre : null;
     actor = actor ? actor : null;
     director = director ? director : null;
 
-    const query = `SELECT DISTINCT movies.name
+    const query = `SELECT DISTINCT movies.name, movies.id
                   FROM movies, movies_genres, actors, directors, movies_directors, roles 
                   WHERE (movies.id = movies_genres.movie_id AND movies.id = movies_directors.movie_id AND movies.id = roles.movie_id AND roles.actor_id = actors.id AND movies_directors.director_id = directors.id)
-                    AND (${name} IS NULL OR movies.name LIKE '%${name}%') 
-                    AND (${startYear} IS NULL OR movies.year >= ${startYear})
-                    AND (${endYear} IS NULL OR movies.year <= ${endYear}) 
-                    AND (${startRank} IS NULL OR movies.rank >= ${startRank})
-                    AND (${endRank} IS NULL OR movies.rank <= ${endRank}) 
-                    AND (${genre} IS NULL OR movies_genres.genre LIKE '%${genre}%')
-                    AND (${actor} IS NULL OR actors.name LIKE '%${actor}%')
-                    AND (${director} IS NULL OR directors.name LIKE '%${director}%')`;
+                    ${name ? "AND (movies.name LIKE'%" + name + "%')" : ''}
+                    ${startYear ? "AND (movies.year >= " + startYear + ")" : ''}
+                    ${endYear ? "AND (movies.year <= " + endYear + ")" : ''}
+                    ${startRank ? "AND (movies.rank >= " + startRank + ")" : ''}
+                    ${endRank ? "AND (movies.rank <= " + endRank + ")" : ''}
+                    ${genre ? "AND (movies_genres.genre LIKE '%" + genre + "%')" : ''}
+                    ${actor ? "AND (actors.name LIKE '%" + actor + "%')" : ''}
+                    ${director ? "AND (directors.name LIKE '%" + director + "%')" : ''}
+                  ORDER BY RAND()
+                  LIMIT 20`;
     const results = await makeQuery(query);
     res.send(results);
   } catch (err) {

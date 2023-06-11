@@ -6,8 +6,8 @@ const { getDirectorById, getMostRatedDirectors, getFavoriteGenres } = require('.
 
 const router = express.Router();
 
-router.get('/getRandomMovies', getRandomMovies);
 router.get('/getMovieById', getMovieById);
+router.get('/getRandomMovies', getRandomMovies);
 router.get('/getMovieByFilter', getMovieByFilter);
 
 router.get('/getActorById', getActorById);
