@@ -17,12 +17,12 @@ const getCommonMovies = async (req, res) => {
     const query = `SELECT DISTINCT movies.name
                   FROM movies, actors, roles 
                   WHERE (movies.id = roles.movie_id AND roles.actor_id = actors.id)
-                    AND actors.id LIKE '%${actor1}%'
+                    AND actors.id '%${actor1}%'
                   INTERSECT
                   SELECT DISTINCT movies.name
                   FROM movies, actors, roles 
                   WHERE (movies.id = roles.movie_id AND roles.actor_id = actors.id)
-                  AND actors.name LIKE '%${actor2}%'`;
+                  AND actors.name = '${actor2}'`;
     const results = await makeQuery(query);
     res.send(results);
   } catch (err) {
