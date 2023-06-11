@@ -33,10 +33,10 @@ const getCommonMovies = async (req, res) => {
 const getMostRatedRoles = async (req, res) => {
   try {
     const { actor } = req.query;
-    const query = `SELECT actors.name, actors.id, AVG(movies.rank) AS avg_rank
+    const query = `SELECT actors.name, actors.id, roles.role, movies.name, movies.year, movies.rank, AVG(movies.rank) AS avg_rank
                   FROM actors, roles, movies
                   WHERE (actors.id = roles.actor_id AND movies.id = roles.movie_id) AND actors.id = ${actor}
-                  GROUP BY actors.name, actors.id
+                  GROUP BY actors.name, actors.id, roles.role, movies.name, movies.year, movies.rank
                   ORDER BY avg_rank DESC
                   LIMIT 20`;
     const results = await makeQuery(query);
